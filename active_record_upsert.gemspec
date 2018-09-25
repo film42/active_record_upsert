@@ -23,5 +23,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'activerecord', '>= 5.0', '< 6.0'
   spec.add_runtime_dependency 'arel', '> 7.0', '< 10.0'
-  spec.add_runtime_dependency 'pg', '>= 0.18', '< 2.0'
+  #spec.add_runtime_dependency 'pg', '>= 0.18', '< 2.0'
+  spec.add_runtime_dependency 'activerecord-jdbcpostgresql-adapter', '~> 50.0'
 end
