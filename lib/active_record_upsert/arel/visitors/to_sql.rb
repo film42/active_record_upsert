@@ -43,10 +43,6 @@ module ActiveRecordUpsert
           collector << "EXCLUDED.#{quote_column_name o.column}"
           collector
         end
-
-        def table_exists?(name)
-          schema_cache.data_source_exists?(name)
-        end
       end
 
       ::Arel::Visitors::ToSql.prepend(ToSqlExtensions)

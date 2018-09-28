@@ -4,14 +4,16 @@ module ActiveRecordUpsert
       def upsert!(attributes: nil, arel_condition: nil, validate: true)
         raise ::ActiveRecord::ReadOnlyRecord, "#{self.class} is marked as readonly" if readonly?
         raise ::ActiveRecord::RecordSavedError, "Can't upsert a record that has already been saved" if persisted?
-        validate == false || perform_validations || raise_validation_error
-        run_callbacks(:save) {
-          run_callbacks(:create) {
-            attributes ||= changed
-            attributes = attributes +
-              timestamp_attributes_for_create_in_model +
-              timestamp_attributes_for_update_in_model
-            _upsert_record(attributes.map(&:to_s).uniq, arel_condition)
+        validate == false || perform_validations || raise_record_invalid
+        run_callbacks(:commit) {
+          run_callbacks(:save) {
+            run_callbacks(:create) {
+              attributes ||= changed
+              attributes = attributes +
+                           timestamp_attributes_for_create_in_model +
+                           timestamp_attributes_for_update_in_model
+              _upsert_record(attributes.map(&:to_s).uniq, arel_condition)
+            }
           }
         }
 
@@ -34,6 +36,7 @@ module ActiveRecordUpsert
 
       def upsert_operation
         created_record = self['_upsert_created_record']
+        created_record = created_record == 't' if created_record.is_a?(::String)
         return if created_record.nil?
         created_record ? :create : :update
       end

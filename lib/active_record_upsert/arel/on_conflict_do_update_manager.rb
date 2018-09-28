@@ -1,6 +1,6 @@
 module Arel
   class OnConflictDoUpdateManager < Arel::TreeManager
-    def initialize
+    def initialize(engine)
       super
       @ast = Nodes::OnConflict.new
       @action = Nodes::DoUpdateSet.new

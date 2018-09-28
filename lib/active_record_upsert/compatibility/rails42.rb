@@ -22,17 +22,18 @@ module ActiveRecordUpsert
     module RelationExtensions
       def upsert(existing_attributes, upsert_attributes, wheres) # :nodoc:
         substitutes, binds = substitute_values(existing_attributes)
+
         upsert_keys = self.klass.upsert_keys || [primary_key]
 
         upsert_attributes = upsert_attributes - [*upsert_keys, 'created_at']
-        upsert_keys_filter = ->(o) { upsert_attributes.include?(o.name) }
+        upsert_keys_filter = ->(o) { upsert_attributes.include?(o.first.name) }
 
         on_conflict_binds = binds.select(&upsert_keys_filter)
-        vals_for_upsert = substitutes.select { |s| upsert_keys_filter.call(s.first) }
+        vals_for_upsert = substitutes.select { |s| upsert_keys_filter.call(s) }
 
         target = arel_table[upsert_options.key?(:literal) ? ::Arel::Nodes::SqlLiteral.new(upsert_options[:literal]) : upsert_keys.join(',')]
 
-        on_conflict_do_update = ::Arel::OnConflictDoUpdateManager.new
+        on_conflict_do_update = ::Arel::OnConflictDoUpdateManager.new(self)
         on_conflict_do_update.target = target
         on_conflict_do_update.target_condition = self.klass.upsert_options[:where]
         on_conflict_do_update.wheres = wheres

@@ -9,7 +9,7 @@ class Vehicle < ApplicationRecord
 
   validates :name, presence: true
 
-  attribute :license, :string, default: 'Unknown'
+  # attribute :license, ::ActiveRecord::Type::String.new, default: 'Unknown'
   belongs_to :account
 
   def before_s
